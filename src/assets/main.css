@@ -1,0 +1,13 @@
+@font-face {
+  font-family: 'Sharp Grotesk Medium 21';
+  src: url('SharpGroteskMedium-21.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
