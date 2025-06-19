@@ -106,7 +106,6 @@ details {
     ); /* Denne må fikses live */
     font-size: var(--typography-editorial-infobox-body-min-font-size);
     line-height: var(--typography-editorial-infobox-body-min-line-height);
-    padding-block-start: var(--spacing-row-gap-min); /* padding for animasjonssmoothness */
   }
 }
 
@@ -116,6 +115,7 @@ summary {
   display: flex;
   justify-content: space-between;
   letter-spacing: 0.05em;
+  padding-block: 1rem;
   padding-inline-end: 2px;
 
   span {
