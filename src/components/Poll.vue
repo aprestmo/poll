@@ -113,7 +113,6 @@ details {
 summary {
   align-items: center;
   column-gap: 0.5ex;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   letter-spacing: 0.05em;
@@ -126,6 +125,10 @@ summary {
     line-height: var(--typography-utility-topic-line-height);
     letter-spacing: var(--typography-utility-topic-letter-spacing);
     text-transform: var(--typography-utility-topic-text-case);
+  }
+
+  svg {
+    cursor: pointer;
   }
 }
 
