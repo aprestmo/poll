@@ -2,18 +2,21 @@
   <form>
     <fieldset>
       <legend>{{ title }}</legend>
-      <label for="">
-        <span></span>
-        <span
-          >This is the same option that spans three lines, and contains enough characters to show
-          line wrapping on the desktop version.</span
-        >
-      </label>
-      <input type="radio" />
+      <QuestionOption
+        :questions="[
+          'This is the same option that spans three lines, and contains enough characters to show line wrapping on the desktop version.',
+          'This is option B with different content.',
+          'This is option C with even more content to demonstrate the alphabetized labels.',
+        ]"
+        :percentages="[35, 45, 20]"
+      />
+
+      <Button />
+
       <footer>
+        <span>Svaret ditt er anonymt</span>
         <details>
           <summary>
-            <span>Svaret ditt er anonymt</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
               <g fill="#53555F" clip-path="url(#a)">
                 <path
@@ -40,6 +43,9 @@
 </template>
 
 <script setup lang="ts">
+import QuestionOption from './QuestionOption.vue'
+import Button from './Button.vue'
+
 const props = defineProps({
   title: {
     type: String,
@@ -77,34 +83,45 @@ form {
 
 fieldset {
   border: none;
+  display: grid;
   font-family: 'Inter';
   font-size: 14px;
   line-height: 1.4;
   padding: 0;
+  row-gap: 1rem;
 }
 
 legend {
+  display: inline-block;
   font-family: 'Sharp Grotesk Medium 21';
   font-size: 1rem;
-  padding-inline-start: 0;
+  margin-block-end: 1rem;
+  padding-inline: 0;
 }
 
-@supports (text-box: trim-both cap alphabetic) {
+/* @supports (text-box: trim-both cap alphabetic) {
   legend,
   label,
   span {
     text-box: trim-both cap alphabetic;
   }
+} */
+
+footer {
+  color: var(--color-typography-secondary);
+  display: grid;
+  grid-template-columns: 1fr 1.25rem;
 }
 
 details {
-  color: var(--color-typography-secondary);
-
   p {
-    font-family: var(
+    /* font-family: var(
       --typography-editorial-infobox-body-min-font-family
-    ); /* Denne må fikses live */
+    ); Denne må fikses live */
+    font-family: 'Inter';
     font-size: var(--typography-editorial-infobox-body-min-font-size);
+    grid-column: 1 / -1;
+    grid-row: 2;
     line-height: var(--typography-editorial-infobox-body-min-line-height);
   }
 }
@@ -119,8 +136,6 @@ summary {
   padding-inline-end: 2px;
 
   span {
-    /* --typography-utility-topic-font-family: Inter; */
-    /* --typography-utility-topic-font-weight: 400; */
     font-size: var(--typography-utility-topic-font-size);
     line-height: var(--typography-utility-topic-line-height);
     letter-spacing: var(--typography-utility-topic-letter-spacing);
