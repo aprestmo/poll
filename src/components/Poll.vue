@@ -76,6 +76,7 @@ const props = defineProps({
 form {
   background-color: var(--color-ui-generic-bg);
   border-radius: var(--border-radius-default-min);
+  font-variant-numeric: tabular-nums;
   padding-block-end: 1.5rem;
   padding-block-start: 1rem;
   padding-inline: 1rem;

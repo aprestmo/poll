@@ -1,26 +1,51 @@
 <template>
-  <div class="option-items">
+  <div class="option-items" :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
     <template v-for="(question, index) in questions" :key="index">
       <label
         :for="getInputId(index)"
-        :style="{ '--gradient-percentage': `${percentages[index]}%` }"
-        :class="{ animate: true }"
+        :style="{
+          '--gradient-percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
+        }"
+        :class="{ animate: selectedOption !== null }"
+        :data-question="selectedOption === index ? 'selected' : undefined"
       >
-        <span>{{ getOptionLabel(index) }}</span>
+        <span class="option-label">
+          <span v-if="selectedOption !== index">{{ getOptionLabel(index) }}</span>
+          <svg
+            v-else
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M15.8604 4.0207L6.47997 13.0404L0.939514 7.71301L1.97918 6.63176L6.47997 10.9594L14.8208 2.93945L15.8604 4.0207Z"
+              fill="#13264A"
+            />
+          </svg>
+        </span>
         <span>{{ question }}</span>
-        <output>{{ percentages[index] }}%</output>
+        <output>{{ getAnimatedPercentage(index) }}%</output>
       </label>
       <input
         type="radio"
         :id="getInputId(index)"
         :name="name"
         :value="getOptionLabel(index).toLowerCase()"
+        :disabled="selectedOption !== null"
+        :data-question="selectedOption === index ? 'selected' : undefined"
+        @change="handleSelection(index)"
       />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+
 interface Props {
   questions: string[]
   percentages?: number[]
@@ -32,12 +57,47 @@ const props = withDefaults(defineProps<Props>(), {
   percentages: () => [25, 45, 30], // Default static data for testing
 })
 
+const selectedOption = ref<number | null>(null)
+const animatedPercentages = ref<number[]>(props.percentages.map(() => 0))
+
 const getOptionLabel = (index: number): string => {
   return String.fromCharCode(65 + index) // 65 is ASCII for 'A'
 }
 
 const getInputId = (index: number): string => {
   return `option-${getOptionLabel(index).toLowerCase()}`
+}
+
+const handleSelection = (index: number) => {
+  selectedOption.value = index
+  animatePercentages()
+}
+
+const animatePercentages = () => {
+  const duration = 800 // 0.8 seconds to match CSS animation
+  const steps = 60 // 60 steps for smooth animation
+  const stepDuration = duration / steps
+
+  let currentStep = 0
+
+  const animate = () => {
+    if (currentStep <= steps) {
+      const progress = currentStep / steps
+
+      animatedPercentages.value = props.percentages.map((target, index) => {
+        return Math.round(target * progress)
+      })
+
+      currentStep++
+      setTimeout(animate, stepDuration)
+    }
+  }
+
+  animate()
+}
+
+const getAnimatedPercentage = (index: number): number => {
+  return selectedOption.value !== null ? animatedPercentages.value[index] : 0
 }
 </script>
 
@@ -53,7 +113,7 @@ const getInputId = (index: number): string => {
 
 .option-items {
   display: grid;
-  grid-template-columns: 2rem auto 1fr;
+  grid-template-columns: 2rem 1fr auto;
   row-gap: 1rem;
 }
 
@@ -83,9 +143,12 @@ label {
   }
 
   &::after {
-    animation: animateGradient 0.8s ease-out forwards;
     background-color: var(--color-brand-utility-700);
-    inline-size: var(--gradient-percentage, 25%);
+    inline-size: var(--gradient-percentage, 0%);
+  }
+
+  &.animate::after {
+    animation: animateGradient 0.8s ease-out forwards;
   }
 
   &::before {
@@ -100,10 +163,33 @@ label {
     padding: 0.5rem;
   }
 
-  span:first-child {
-    color: var(--color-typography-default);
-    font-weight: 700;
-    text-align: center;
+  .option-label span {
+    border-start-start-radius: 2px;
+    inline-size: 100%;
+    padding: 0;
+    place-content: center;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease-out;
+
+    span {
+      block-size: 100%;
+      font-weight: 700;
+      text-align: center;
+    }
+  }
+
+  .option-label span,
+  .option-label svg {
+    transition: opacity 0.3s ease-out;
+  }
+
+  .option-label svg {
+    color: var(--color-brand-utility-700);
   }
 
   span:nth-child(1) {
@@ -129,6 +215,10 @@ label {
     &:hover > label:not(:hover) {
       opacity: 50%;
     }
+
+    &[data-state='answered']:hover > label:not(:hover) {
+      opacity: 100%;
+    }
   }
 }
 
@@ -142,5 +232,23 @@ input[type='radio'] {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+[data-question='selected'] {
+  span,
+  output {
+    font-weight: 600;
+  }
+
+  .option-label {
+    background-color: var(--color-brand-utility-100);
+    block-size: 100%;
+    border-start-start-radius: 2px;
+    padding: 0;
+  }
+}
+
+[disabled] {
+  pointer-events: none;
 }
 </style>
