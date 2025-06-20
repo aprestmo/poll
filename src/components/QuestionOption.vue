@@ -1,6 +1,6 @@
 <template>
-  <div class="option-items" :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
-    <template v-for="(question, index) in questions" :key="index">
+  <ol :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
+    <li v-for="(question, index) in questions" :key="index">
       <label
         :for="getInputId(index)"
         :style="{
@@ -29,6 +29,7 @@
         </span>
         <span>{{ question }}</span>
         <output>{{ getAnimatedPercentage(index) }}%</output>
+        <meter :value="getAnimatedPercentage(index)" :max="100"></meter>
       </label>
       <input
         type="radio"
@@ -39,8 +40,8 @@
         :data-question="selectedOption === index ? 'selected' : undefined"
         @change="handleSelection(index)"
       />
-    </template>
-  </div>
+    </li>
+  </ol>
 </template>
 
 <script setup lang="ts">
@@ -111,51 +112,29 @@ const getAnimatedPercentage = (index: number): number => {
   }
 }
 
-.option-items {
+ol {
+  list-style-type: none;
+  padding-inline-start: 0;
+}
+
+li {
   display: grid;
   grid-template-columns: 2rem 1fr auto;
+  grid-template-rows: 1fr 4px;
   row-gap: 1rem;
 }
 
 label {
-  align-items: center;
   background-color: var(--color-brand-utility-0);
+  align-items: center;
   border-start-end-radius: var(--border-radius-default-min);
-  border-start-start-radius: var(--border-radius-default-min);
+  border-radius: var(--border-radius-default-min) var(--border-radius-default-min) 4px 4px;
   color: var(--color-typography-secondary);
   cursor: pointer;
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  position: relative;
-
-  & > * {
-    pointer-events: none;
-  }
-
-  &::after,
-  &::before {
-    block-size: 0.25rem;
-    border-end-start-radius: 4px;
-    content: '';
-    inset-block-end: -0.25rem;
-    position: absolute;
-  }
-
-  &::after {
-    background-color: var(--color-brand-utility-700);
-    inline-size: var(--gradient-percentage, 0%);
-  }
-
-  &.animate::after {
-    animation: animateGradient 0.8s ease-out forwards;
-  }
-
-  &::before {
-    background-color: var(--color-brand-utility-200);
-    border-end-end-radius: 4px;
-    inline-size: 100%;
-  }
+  overflow: clip;
 
   span,
   output {
@@ -203,6 +182,32 @@ label {
 
   output {
     grid-column: 3 / 4;
+  }
+}
+
+meter {
+  background: var(--color-brand-utility-200);
+  block-size: 4px;
+  box-shadow: none;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  inline-size: 100%;
+
+  &::-webkit-meter-bar {
+    background: var(--color-brand-utility-200);
+    block-size: inherit;
+  }
+
+  &::-webkit-meter-inner-element {
+    block-size: inherit;
+  }
+
+  &::-webkit-meter-optimum-value {
+    background: var(--color-brand-utility-700);
+  }
+
+  &::-moz-meter-bar {
+    background: var(--color-brand-utility-700);
   }
 }
 
