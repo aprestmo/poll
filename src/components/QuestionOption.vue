@@ -143,10 +143,11 @@ ol {
   list-style-type: upper-latin;
   list-style-position: inside;
   padding-inline-start: 0;
+  row-gap: 1rem;
 
-  & > * + * {
+  /* & > * + * {
     padding-block-start: 1rem;
-  }
+  } */
 }
 
 li {
@@ -166,11 +167,7 @@ label {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  grid-template-rows: auto 4px;
   min-block-size: 2.5rem;
-
-  padding-block: 0.75rem;
-  padding-inline: 0.5rem;
 
   &::before {
     align-content: center;
@@ -183,6 +180,8 @@ label {
   > * {
     align-content: center;
     block-size: 100%;
+    padding-block: 0.75rem;
+    padding-inline: 0.5rem;
   }
 }
 
@@ -256,6 +255,13 @@ input[type='radio'] {
         opacity: 50%;
       }
     }
+  }
+}
+
+/* Answered state */
+[data-state='answered'] {
+  [data-question='selected']::before {
+    background-color: var(--color-utility-success-light);
   }
 }
 </style>
