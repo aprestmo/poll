@@ -1,4 +1,11 @@
 @font-face {
+  font-family: 'Sharp Grotesk Book 20';
+  src: url('SharpGroteskBook-20.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'Sharp Grotesk Medium 21';
   src: url('SharpGroteskMedium-21.woff2') format('woff2');
   font-weight: 400;
@@ -24,6 +31,12 @@
   src: url('Inter-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 * {

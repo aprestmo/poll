@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <form :data-user="isAuthenticated ? 'logged-in' : 'not-logged-in'">
     <fieldset>
       <legend>{{ title }}</legend>
       <QuestionOption
@@ -9,9 +9,10 @@
           'This is option C with even more content to demonstrate the alphabetized labels.',
         ]"
         :percentages="[35, 45, 20]"
+        :is-authenticated="isAuthenticated"
       />
 
-      <Button />
+      <Button v-if="!isAuthenticated" @click="handleLogin" />
 
       <footer>
         <span>Svaret ditt er anonymt</span>
@@ -43,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import QuestionOption from './QuestionOption.vue'
 import Button from './Button.vue'
 
@@ -52,6 +54,13 @@ const props = defineProps({
     default: '',
   },
 })
+
+const isAuthenticated = ref(false)
+
+const handleLogin = (event: Event) => {
+  event.preventDefault()
+  isAuthenticated.value = true
+}
 </script>
 
 <style>
@@ -80,23 +89,29 @@ form {
   padding-block-end: 1.5rem;
   padding-block-start: 1rem;
   padding-inline: 1rem;
+
+  &[data-state='not-logged in'] ol {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 fieldset {
   border: none;
-  display: grid;
   font-family: 'Inter';
   font-size: 14px;
   line-height: 1.4;
   padding: 0;
-  row-gap: 1rem;
+
+  & > * + * {
+    margin-block-start: 1rem;
+  }
 }
 
 legend {
   display: inline-block;
   font-family: 'Sharp Grotesk Medium 21';
   font-size: 1rem;
-  margin-block-end: 1rem;
   padding-inline: 0;
 }
 
