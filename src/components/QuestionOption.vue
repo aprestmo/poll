@@ -78,6 +78,10 @@ const props = withDefaults(defineProps<Props>(), {
   isAuthenticated: false,
 })
 
+const emit = defineEmits<{
+  'poll-answered': []
+}>()
+
 const selectedOption = ref<number | null>(null)
 const animatedPercentages = ref<number[]>(props.percentages.map(() => 0))
 const enabledInputs = ref<boolean[]>(props.questions.map(() => false))
@@ -97,6 +101,7 @@ const enableInput = (index: number) => {
 const handleSelection = (index: number) => {
   selectedOption.value = index
   animatePercentages()
+  emit('poll-answered')
 }
 
 const animatePercentages = () => {
@@ -144,10 +149,6 @@ ol {
   list-style-position: inside;
   padding-inline-start: 0;
   row-gap: 1rem;
-
-  /* & > * + * {
-    padding-block-start: 1rem;
-  } */
 }
 
 li {

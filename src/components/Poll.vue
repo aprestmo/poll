@@ -10,12 +10,16 @@
         ]"
         :percentages="[35, 45, 20]"
         :is-authenticated="isAuthenticated"
+        :key="pollResetKey"
+        @poll-answered="handlePollAnswered"
       />
 
       <Button v-if="!isAuthenticated" @click="handleLogin" />
 
       <footer>
-        <span>Svaret ditt er anonymt</span>
+        <span v-if="!isAnswered">Svaret ditt er anonymt</span>
+        <span v-else class="vote-count">{{ NumberFormat(randomVoteCount) }} stemmer</span>
+        <button v-if="isAnswered" @click="handleVoteAgain" type="reset">Stem på nytt</button>
         <details>
           <summary>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
@@ -47,6 +51,7 @@
 import { ref } from 'vue'
 import QuestionOption from './QuestionOption.vue'
 import Button from './Button.vue'
+import { NumberFormat } from '../utils/utils'
 
 const props = defineProps({
   title: {
@@ -56,10 +61,26 @@ const props = defineProps({
 })
 
 const isAuthenticated = ref(false)
+const isAnswered = ref(false)
+const randomVoteCount = ref(0)
+const pollResetKey = ref(0)
 
 const handleLogin = (event: Event) => {
   event.preventDefault()
   isAuthenticated.value = true
+}
+
+const handlePollAnswered = () => {
+  isAnswered.value = true
+  // Generate a random number between 1000 and 50000
+  randomVoteCount.value = Math.floor(Math.random() * 49000) + 1000
+}
+
+const handleVoteAgain = () => {
+  isAnswered.value = false
+  randomVoteCount.value = 0
+  // Reset the poll state by triggering a reset event
+  pollResetKey.value++
 }
 </script>
 
@@ -126,7 +147,22 @@ legend {
 footer {
   color: var(--color-typography-secondary);
   display: grid;
-  grid-template-columns: 1fr 1.25rem;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* grid-template-columns: 1fr 1.25rem; */
+}
+
+[type='reset'] {
+  background-color: var(--color-button-secondary-default-bg);
+  border: none;
+  color: var(--color-button-secondary-default-fg);
+  cursor: pointer;
+  display: inline;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+  text-transform: uppercase;
 }
 
 details {
@@ -165,8 +201,5 @@ summary {
 
 summary::marker {
   content: '';
-}
-
-footer {
 }
 </style>
