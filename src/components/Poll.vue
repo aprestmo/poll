@@ -94,6 +94,7 @@ fieldset {
 }
 
 legend {
+  color: var(--color-typography-default);
   display: inline-block;
   font-family: 'Sharp Grotesk Medium 21';
   font-size: 1rem;
