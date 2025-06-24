@@ -42,3 +42,24 @@
 * {
   margin: 0;
 }
+
+:is(button, li, summary) {
+  --outline-size: max(2px, 0.08em);
+  --outline-style: dashed;
+  --outline-color: currentColor;
+  --outline-offset: 0.5em;
+}
+
+:is(button, li, summary):focus {
+  outline: var(--outline-size) var(--outline-style) var(--outline-color);
+  outline-offset: var(--outline-offset, var(--outline-size));
+}
+
+:is(button, li, summary):focus-visible {
+  outline: var(--outline-size) var(--outline-style) var(--outline-color);
+  outline-offset: var(--outline-offset, var(--outline-size));
+}
+
+:is(button, li, summary):focus:not(:focus-visible) {
+  outline: none;
+}

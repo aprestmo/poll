@@ -1,6 +1,6 @@
 <template>
   <ol :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
-    <li v-for="(question, index) in questions" :key="index">
+    <li v-for="(question, index) in questions" :key="index" :tabindex="isAuthenticated ? 0 : -1">
       <label
         :for="getInputId(index)"
         :style="{
@@ -55,6 +55,7 @@
           :disabled="selectedOption !== null"
           :data-question="selectedOption === index ? 'selected' : undefined"
           @change="handleSelection(index)"
+          tabindex="-1"
         />
       </label>
       <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
