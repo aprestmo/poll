@@ -1,82 +1,89 @@
 <template>
-  <ol :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
-    <li v-for="(question, index) in questions" :key="index">
+  <div>
+    <template v-for="(question, index) in questions" :key="index">
       <label
+        :tabindex="isAuthenticated ? 0 : -1"
         :for="getInputId(index)"
         :style="{
-          '--gradient-percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
+          '--percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
         }"
-        :class="{ animate: selectedOption !== null }"
+        :class="{
+          animate: selectedOption !== null || isAuthenticated,
+          disabled: !isAuthenticated,
+        }"
         :data-question="selectedOption === index ? 'selected' : undefined"
+        @click="handleLabelClick(index)"
+        @keydown.enter="handleLabelClick(index)"
+        @keydown.space="handleLabelClick(index)"
       >
-        <span class="option-label">
-          <span v-if="selectedOption !== index">{{ getOptionLabel(index) }}</span>
-          <svg
-            v-else
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M15.8604 4.0207L6.47997 13.0404L0.939514 7.71301L1.97918 6.63176L6.47997 10.9594L14.8208 2.93945L15.8604 4.0207Z"
-              fill="#13264A"
-            />
-          </svg>
-        </span>
         <span>{{ question }}</span>
-        <output>{{ getAnimatedPercentage(index) }}%</output>
-        <meter :value="getAnimatedPercentage(index)" :max="100"></meter>
+        <template v-if="selectedOption === null && !isAuthenticated">
+          <LockIcon />
+        </template>
+        <output v-else :for="getInputId(index)">{{ getAnimatedPercentage(index) }}%</output>
+        <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
+        <input
+          class="visually-hidden"
+          type="radio"
+          :id="getInputId(index)"
+          :name="name"
+          :value="getOptionLabel(index).toLowerCase()"
+          :disabled="selectedOption !== null"
+          :data-question="selectedOption === index ? 'selected' : undefined"
+          @change="handleSelection(index)"
+          tabindex="-1"
+        />
       </label>
-      <input
-        type="radio"
-        :id="getInputId(index)"
-        :name="name"
-        :value="getOptionLabel(index).toLowerCase()"
-        :disabled="selectedOption !== null"
-        :data-question="selectedOption === index ? 'selected' : undefined"
-        @change="handleSelection(index)"
-      />
-    </li>
-  </ol>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref } from 'vue'
+import LockIcon from '../assets/lock.svg'
 
 interface Props {
   questions: string[]
   percentages?: number[]
   name?: string
+  isAuthenticated?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   name: 'poll-option',
-  percentages: () => [25, 45, 30], // Default static data for testing
+  percentages: () => [25, 45, 30],
+  isAuthenticated: false,
 })
+
+const emit = defineEmits<{
+  'poll-answered': []
+}>()
 
 const selectedOption = ref<number | null>(null)
 const animatedPercentages = ref<number[]>(props.percentages.map(() => 0))
+const enabledInputs = ref<boolean[]>(props.questions.map(() => false))
 
 const getOptionLabel = (index: number): string => {
-  return String.fromCharCode(65 + index) // 65 is ASCII for 'A'
+  return String.fromCharCode(65 + index)
 }
 
 const getInputId = (index: number): string => {
   return `option-${getOptionLabel(index).toLowerCase()}`
 }
 
+const enableInput = (index: number) => {
+  enabledInputs.value = enabledInputs.value.map((v, i) => (i === index ? true : v))
+}
+
 const handleSelection = (index: number) => {
   selectedOption.value = index
   animatePercentages()
+  emit('poll-answered')
 }
 
 const animatePercentages = () => {
-  const duration = 800 // 0.8 seconds to match CSS animation
-  const steps = 60 // 60 steps for smooth animation
+  const duration = 800
+  const steps = 60
   const stepDuration = duration / steps
 
   let currentStep = 0
@@ -85,7 +92,7 @@ const animatePercentages = () => {
     if (currentStep <= steps) {
       const progress = currentStep / steps
 
-      animatedPercentages.value = props.percentages.map((target, index) => {
+      animatedPercentages.value = props.percentages.map((target) => {
         return Math.round(target * progress)
       })
 
@@ -100,101 +107,89 @@ const animatePercentages = () => {
 const getAnimatedPercentage = (index: number): number => {
   return selectedOption.value !== null ? animatedPercentages.value[index] : 0
 }
+
+const handleLabelClick = (index: number) => {
+  if (!props.isAuthenticated) return
+  if (selectedOption.value !== null) return
+
+  selectedOption.value = index
+  animatePercentages()
+  emit('poll-answered')
+}
 </script>
 
 <style>
-@keyframes animateGradient {
-  0% {
-    inline-size: 0%;
-  }
-  100% {
-    inline-size: var(--gradient-percentage);
-  }
-}
-
-ol {
-  list-style-type: none;
-  padding-inline-start: 0;
-}
-
-li {
+fieldset div {
+  align-items: center;
   display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  grid-template-rows: 1fr 4px;
+  grid-template-columns: 2rem 1fr 7ch;
+  list-style-type: upper-latin;
+  list-style-position: inside;
+  padding-inline-start: 0;
   row-gap: 1rem;
+
+  > * + * {
+    /* margin-block-start: 1rem; */
+  }
+}
+
+label {
+  border-radius: var(--border-radius-default-min) var(--border-radius-default-min)
+    calc(var(--border-radius-default-max) * 2) calc(var(--border-radius-default-max) * 2);
+  counter-increment: item;
+  overflow: clip;
 }
 
 label {
   background-color: var(--color-brand-utility-0);
   align-items: center;
-  border-start-end-radius: var(--border-radius-default-min);
-  border-radius: var(--border-radius-default-min) var(--border-radius-default-min) 4px 4px;
-  color: var(--color-typography-secondary);
   cursor: pointer;
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  overflow: clip;
+  min-block-size: 2.5rem;
 
-  span,
-  output {
-    grid-template-columns: subgrid;
-    padding: 0.5rem;
+  &::before {
+    align-content: center;
+    block-size: 100%;
+    content: counter(item, upper-latin) ' ';
+    font-weight: 700;
+    text-align: center;
   }
 
-  .option-label span {
-    border-start-start-radius: 2px;
-    inline-size: 100%;
-    padding: 0;
-    place-content: center;
-  }
-
-  .option-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s ease-out;
-
-    span {
-      block-size: 100%;
-      font-weight: 700;
-      text-align: center;
-    }
-  }
-
-  .option-label span,
-  .option-label svg {
-    transition: opacity 0.3s ease-out;
-  }
-
-  .option-label svg {
-    color: var(--color-brand-utility-700);
-  }
-
-  span:nth-child(1) {
-    grid-column: 1 / 2;
-  }
-
-  span:nth-child(2) {
+  span {
     border-inline-start: 1px solid var(--color-ui-generic-bg);
-    grid-column: 2 / 3;
   }
 
-  output {
-    grid-column: 3 / 4;
+  > *:not(meter) {
+    padding-block: 0.75rem;
+    padding-inline: 0.5rem;
   }
+
+  svg {
+    box-sizing: content-box;
+    margin-inline-start: auto;
+  }
+}
+
+output {
+  margin-inline-start: auto;
+  min-inline-size: 7ch;
+  text-align: right;
 }
 
 meter {
   background: var(--color-brand-utility-200);
   block-size: 4px;
-  box-shadow: none;
   grid-column: 1 / -1;
-  grid-row: 2;
   inline-size: 100%;
 
   &::-webkit-meter-bar {
     background: var(--color-brand-utility-200);
+    block-size: inherit;
+  }
+
+  &::-webkit-meter-inner-element {
     block-size: inherit;
   }
 
@@ -211,7 +206,19 @@ meter {
   }
 }
 
-.option-items {
+/*
+ * States
+ */
+
+/* Not logged in state */
+[data-user='not-logged-in'] legend + div {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Logged in state */
+[data-user='logged-in'][data-state='unanswered'] div {
   @media (hover) and (prefers-reduced-motion: no-preference) {
     label {
       transition: opacity 360ms ease-out;
@@ -220,40 +227,18 @@ meter {
     &:hover > label:not(:hover) {
       opacity: 50%;
     }
-
-    &[data-state='answered']:hover > label:not(:hover) {
-      opacity: 100%;
-    }
   }
 }
 
-input[type='radio'] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-[data-question='selected'] {
-  span,
-  output {
-    font-weight: 600;
+/* Answered state */
+[data-state='answered'] {
+  [data-question='selected']::before {
+    background-color: var(--color-utility-success-light);
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNS44NjA0IDQuMDIwN0w2LjQ3OTk3IDEzLjA0MDRMMC45Mzk1MTQgNy43MTMwMUwxLjk3OTE4IDYuNjMxNzZMNi40Nzk5NyAxMC45NTk0TDE0LjgyMDggMi45Mzk0NUwxNS44NjA0IDQuMDIwN1oiIGZpbGw9IiMxMzI2NEEiLz4KPC9zdmc+Cg==');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    content: '';
   }
-
-  .option-label {
-    background-color: var(--color-brand-utility-100);
-    block-size: 100%;
-    border-start-start-radius: 2px;
-    padding: 0;
-  }
-}
-
-[disabled] {
-  pointer-events: none;
 }
 </style>

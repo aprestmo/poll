@@ -1,4 +1,11 @@
 @font-face {
+  font-family: 'Sharp Grotesk Book 20';
+  src: url('SharpGroteskBook-20.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'Sharp Grotesk Medium 21';
   src: url('SharpGroteskMedium-21.woff2') format('woff2');
   font-weight: 400;
@@ -26,6 +33,43 @@
   font-style: normal;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 * {
   margin: 0;
+}
+
+@keyframes animateGradient {
+  0% {
+    inline-size: 0%;
+  }
+  100% {
+    inline-size: var(--percentage);
+  }
+}
+
+/* Focus styles */
+:is(button, label, summary) {
+  --outline-size: max(2px, 0.08em);
+  --outline-style: dashed;
+  --outline-color: var(--color-brand-utility-200);
+  --outline-offset: 0.5em;
+}
+
+:is(button, label, summary):focus {
+  outline: var(--outline-size) var(--outline-style) var(--outline-color);
+  outline-offset: var(--outline-offset, var(--outline-size));
+}
+
+:is(button, label, summary):focus-visible {
+  outline: var(--outline-size) var(--outline-style) var(--outline-color);
+  outline-offset: var(--outline-offset, var(--outline-size));
+}
+
+:is(button, label, summary):focus:not(:focus-visible) {
+  outline: none;
 }

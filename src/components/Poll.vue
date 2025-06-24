@@ -1,5 +1,8 @@
 <template>
-  <form>
+  <form
+    :data-user="isAuthenticated ? 'logged-in' : 'not-logged-in'"
+    :data-state="isAnswered ? 'answered' : 'unanswered'"
+  >
     <fieldset>
       <legend>{{ title }}</legend>
       <QuestionOption
@@ -9,70 +12,61 @@
           'This is option C with even more content to demonstrate the alphabetized labels.',
         ]"
         :percentages="[35, 45, 20]"
+        :is-authenticated="isAuthenticated"
+        :key="pollResetKey"
+        @poll-answered="handlePollAnswered"
       />
 
-      <Button />
+      <FakeButton v-if="!isAuthenticated" @click="handleLogin" />
 
       <footer>
-        <span>Svaret ditt er anonymt</span>
-        <details>
-          <summary>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
-              <g fill="#53555F" clip-path="url(#a)">
-                <path
-                  fill-rule="evenodd"
-                  d="M8 1.167a6.833 6.833 0 1 0 0 13.666A6.833 6.833 0 0 0 8 1.166ZM.165 8a7.833 7.833 0 1 1 15.667 0A7.833 7.833 0 0 1 .166 8Z"
-                  clip-rule="evenodd"
-                />
-                <path fill-rule="evenodd" d="M8.5 6.833v5h-1v-5h1Z" clip-rule="evenodd" />
-                <path d="M8 5.333A.667.667 0 1 0 8 4a.667.667 0 0 0 0 1.333Z" />
-              </g>
-              <defs>
-                <clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z" /></clipPath>
-              </defs>
-            </svg>
-          </summary>
-          <p>
-            Resultatene viser hva DNs lesere har svart, og er ikke nødvendigvis representative for
-            befolkningen i sin helhet.
-          </p>
-        </details>
+        <span v-if="!isAnswered">Svaret ditt er anonymt</span>
+        <span v-else>{{ NumberFormat(randomVoteCount) }} stemmer</span>
+        <button v-if="isAnswered" @click="handleVoteAgain" type="reset">Stem på nytt</button>
+        <Disclaimer />
       </footer>
     </fieldset>
   </form>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import QuestionOption from './QuestionOption.vue'
-import Button from './Button.vue'
+import FakeButton from './FakeButton.vue'
+import Disclaimer from './Disclaimer.vue'
+import { NumberFormat } from '../utils/utils'
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: '',
-  },
-})
+interface Props {
+  title: string
+}
+
+const props = defineProps<Props>()
+
+const isAuthenticated = ref(false)
+const isAnswered = ref(false)
+const randomVoteCount = ref(0)
+const pollResetKey = ref(0)
+
+const handleLogin = (event: Event) => {
+  event.preventDefault()
+  isAuthenticated.value = true
+}
+
+const handlePollAnswered = () => {
+  isAnswered.value = true
+  // Generate a random number between 1000 and 50000
+  randomVoteCount.value = Math.floor(Math.random() * 49000) + 1000
+}
+
+const handleVoteAgain = () => {
+  isAnswered.value = false
+  randomVoteCount.value = 0
+  // Reset the poll state by triggering a reset event
+  pollResetKey.value++
+}
 </script>
 
 <style>
-@supports (interpolate-size: allow-keywords) {
-  :root {
-    interpolate-size: allow-keywords;
-  }
-
-  [open]::details-content {
-    height: auto;
-  }
-
-  ::details-content {
-    transition:
-      height 0.25s ease,
-      content-visibility 0.25s ease allow-discrete;
-    height: 0;
-    overflow: clip;
-  }
-}
-
 form {
   background-color: var(--color-ui-generic-bg);
   border-radius: var(--border-radius-default-min);
@@ -80,23 +74,29 @@ form {
   padding-block-end: 1.5rem;
   padding-block-start: 1rem;
   padding-inline: 1rem;
+
+  &[data-state='not-logged in'] div[data-state] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 fieldset {
   border: none;
-  display: grid;
   font-family: 'Inter';
   font-size: 14px;
   line-height: 1.4;
   padding: 0;
-  row-gap: 1rem;
+
+  & > * + * {
+    margin-block-start: 1rem;
+  }
 }
 
 legend {
   display: inline-block;
   font-family: 'Sharp Grotesk Medium 21';
   font-size: 1rem;
-  margin-block-end: 1rem;
   padding-inline: 0;
 }
 
@@ -109,49 +109,41 @@ legend {
 } */
 
 footer {
-  color: var(--color-typography-secondary);
-  display: grid;
-  grid-template-columns: 1fr 1.25rem;
-}
-
-details {
-  p {
-    /* font-family: var(
-      --typography-editorial-infobox-body-min-font-family
-    ); Denne må fikses live */
-    font-family: 'Inter';
-    font-size: var(--typography-editorial-infobox-body-min-font-size);
-    grid-column: 1 / -1;
-    grid-row: 2;
-    line-height: var(--typography-editorial-infobox-body-min-line-height);
-  }
-}
-
-summary {
   align-items: center;
-  column-gap: 0.5ex;
+  color: var(--color-typography-secondary);
   display: flex;
-  justify-content: space-between;
-  letter-spacing: 0.05em;
-  padding-block: 1rem;
-  padding-inline-end: 2px;
+  flex-wrap: wrap;
+  padding-inline: 0.125rem;
+  row-gap: 1rem;
 
-  span {
+  button {
+    background-color: var(--color-button-secondary-default-bg);
+    border: none;
+    color: var(--color-button-secondary-default-fg);
+    cursor: pointer;
+    display: inline;
+    font: inherit;
+    margin-inline-start: 1rem;
+    text-decoration: underline;
+    text-underline-offset: 0.125rem;
+    text-transform: uppercase;
+  }
+
+  > *:not(details) {
+    font-family: var(--typography-utility-topic-font-family);
     font-size: var(--typography-utility-topic-font-size);
-    line-height: var(--typography-utility-topic-line-height);
     letter-spacing: var(--typography-utility-topic-letter-spacing);
+    line-height: var(--typography-utility-topic-line-height);
     text-transform: var(--typography-utility-topic-text-case);
   }
-
-  svg {
-    cursor: pointer;
-  }
 }
 
-summary::marker {
-  content: '';
-}
-
-footer {
+.visually-hidden {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 </style>

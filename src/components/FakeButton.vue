@@ -1,15 +1,23 @@
 <template>
-  <a href="">Logg inn for å stemme</a>
+  <button @click="$emit('click', $event)">Logg inn for å stemme</button>
 </template>
 
+<script setup lang="ts">
+defineEmits<{
+  click: [event: Event]
+}>()
+</script>
+
 <style scoped>
-a {
+button {
   background-color: var(--color-button-primary-default-bg);
+  border: 0;
   border-radius: var(--border-radius-button);
   color: var(--color-button-primary-default-fg);
   cursor: pointer;
+  display: block;
   font-family: 'Sharp Grotesk Book 20';
-  inline-size: auto;
+  inline-size: 100%;
   letter-spacing: var(--typography-utility-button-l-letter-spacing);
   line-height: var(--typography-utility-button-l-line-height);
   padding-block: 1.25rem;
