@@ -1,7 +1,8 @@
 <template>
-  <ol :data-state="selectedOption !== null ? 'answered' : 'unanswered'">
-    <li v-for="(question, index) in questions" :key="index" :tabindex="isAuthenticated ? 0 : -1">
+  <div>
+    <template v-for="(question, index) in questions" :key="index">
       <label
+        :tabindex="isAuthenticated ? 0 : -1"
         :for="getInputId(index)"
         :style="{
           '--percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
@@ -11,43 +12,18 @@
           disabled: !isAuthenticated,
         }"
         :data-question="selectedOption === index ? 'selected' : undefined"
+        @click="handleLabelClick(index)"
+        @keydown.enter="handleLabelClick(index)"
+        @keydown.space="handleLabelClick(index)"
       >
         <span>{{ question }}</span>
-        <span
-          v-if="selectedOption === null && !isAuthenticated"
-          class="option-icon"
-          aria-hidden="true"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clip-path="url(#clip0_2393_15369)">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M8.50002 11.937V13.1667H7.50002V11.937C6.63741 11.715 6.00002 10.9319 6.00002 10C6.00002 8.89543 6.89545 8 8.00002 8C9.10459 8 10 8.89543 10 10C10 10.9319 9.36263 11.715 8.50002 11.937ZM9.00002 10C9.00002 10.5523 8.5523 11 8.00002 11C7.44773 11 7.00002 10.5523 7.00002 10C7.00002 9.44772 7.44773 9 8.00002 9C8.5523 9 9.00002 9.44772 9.00002 10Z"
-                fill="#858B94"
-              />
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M4.00002 5.33333H2.50002C1.4875 5.33333 0.666687 6.17609 0.666687 7.21569V14.1176C0.666687 15.1572 1.4875 16 2.50002 16H13.5C14.5125 16 15.3334 15.1572 15.3334 14.1176V7.21569C15.3334 6.17609 14.5125 5.33333 13.5 5.33333H12V3.44498C11.9969 2.53215 11.5744 1.65749 10.825 1.01202C10.0755 0.366553 9.05991 0.00272623 8.00002 0C6.94013 0.00272623 5.92455 0.366553 5.17509 1.01202C4.42563 1.65749 4.00319 2.53215 4.00002 3.44498V5.33333ZM5.00002 5.33333V3.44688C5.00256 2.85073 5.27762 2.24347 5.82767 1.76974C6.38222 1.29214 7.16127 1.00275 8.00002 1C8.83877 1.00275 9.61782 1.29214 10.1724 1.76974C10.7224 2.24345 10.9975 2.85068 11 3.44681V5.33333H5.00002ZM1.66669 7.21569C1.66669 6.70334 2.06449 6.33333 2.50002 6.33333H13.5C13.9355 6.33333 14.3334 6.70334 14.3334 7.21569V14.1176C14.3334 14.63 13.9355 15 13.5 15H2.50002C2.06449 15 1.66669 14.63 1.66669 14.1176V7.21569Z"
-                fill="#858B94"
-              />
-            </g>
-            <defs>
-              <clipPath id="clip0_2393_15369">
-                <rect width="16" height="16" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-        </span>
+        <template v-if="selectedOption === null && !isAuthenticated">
+          <LockIcon />
+        </template>
         <output v-else :for="getInputId(index)">{{ getAnimatedPercentage(index) }}%</output>
+        <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
         <input
+          class="visually-hidden"
           type="radio"
           :id="getInputId(index)"
           :name="name"
@@ -58,13 +34,13 @@
           tabindex="-1"
         />
       </label>
-      <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
-    </li>
-  </ol>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import LockIcon from '../assets/lock.svg'
 
 interface Props {
   questions: string[]
@@ -131,34 +107,36 @@ const animatePercentages = () => {
 const getAnimatedPercentage = (index: number): number => {
   return selectedOption.value !== null ? animatedPercentages.value[index] : 0
 }
+
+const handleLabelClick = (index: number) => {
+  if (!props.isAuthenticated) return
+  if (selectedOption.value !== null) return
+
+  selectedOption.value = index
+  animatePercentages()
+  emit('poll-answered')
+}
 </script>
 
 <style>
-@keyframes animateGradient {
-  0% {
-    inline-size: 0%;
-  }
-  100% {
-    inline-size: var(--percentage);
-  }
-}
-
-ol {
+fieldset div {
+  align-items: center;
   display: grid;
-  grid-template-columns: 2rem 1fr auto;
+  grid-template-columns: 2rem 1fr 7ch;
   list-style-type: upper-latin;
   list-style-position: inside;
   padding-inline-start: 0;
   row-gap: 1rem;
+
+  > * + * {
+    /* margin-block-start: 1rem; */
+  }
 }
 
-li {
+label {
   border-radius: var(--border-radius-default-min) var(--border-radius-default-min)
     calc(var(--border-radius-default-max) * 2) calc(var(--border-radius-default-max) * 2);
   counter-increment: item;
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
   overflow: clip;
 }
 
@@ -179,15 +157,24 @@ label {
     text-align: center;
   }
 
-  > * {
-    align-content: center;
-    block-size: 100%;
+  span {
+    border-inline-start: 1px solid var(--color-ui-generic-bg);
+  }
+
+  > *:not(meter) {
     padding-block: 0.75rem;
     padding-inline: 0.5rem;
+  }
+
+  svg {
+    box-sizing: content-box;
+    margin-inline-start: auto;
   }
 }
 
 output {
+  margin-inline-start: auto;
+  min-inline-size: 7ch;
   text-align: right;
 }
 
@@ -219,43 +206,26 @@ meter {
   }
 }
 
-/* Utility class */
-input[type='radio'] {
-  border: 0;
-  clip: rect(0, 0, 0, 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  white-space: nowrap;
-  width: 1px;
-}
-
 /*
  * States
  */
 
 /* Not logged in state */
-[data-user='not-logged-in'] {
-  ol {
-    cursor: not-allowed;
-    opacity: 0.5;
-    pointer-events: none;
-  }
+[data-user='not-logged-in'] legend + div {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Logged in state */
-[data-user='logged-in'] [data-state='unanswered'] {
-  ol {
-    @media (hover) and (prefers-reduced-motion: no-preference) {
-      li {
-        transition: opacity 360ms ease-out;
-      }
+[data-user='logged-in'][data-state='unanswered'] div {
+  @media (hover) and (prefers-reduced-motion: no-preference) {
+    label {
+      transition: opacity 360ms ease-out;
+    }
 
-      &:hover > li:not(:hover) {
-        opacity: 50%;
-      }
+    &:hover > label:not(:hover) {
+      opacity: 50%;
     }
   }
 }

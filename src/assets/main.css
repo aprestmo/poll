@@ -43,23 +43,33 @@
   margin: 0;
 }
 
-:is(button, li, summary) {
+@keyframes animateGradient {
+  0% {
+    inline-size: 0%;
+  }
+  100% {
+    inline-size: var(--percentage);
+  }
+}
+
+/* Focus styles */
+:is(button, label, summary) {
   --outline-size: max(2px, 0.08em);
   --outline-style: dashed;
-  --outline-color: currentColor;
+  --outline-color: var(--color-brand-utility-200);
   --outline-offset: 0.5em;
 }
 
-:is(button, li, summary):focus {
+:is(button, label, summary):focus {
   outline: var(--outline-size) var(--outline-style) var(--outline-color);
   outline-offset: var(--outline-offset, var(--outline-size));
 }
 
-:is(button, li, summary):focus-visible {
+:is(button, label, summary):focus-visible {
   outline: var(--outline-size) var(--outline-style) var(--outline-color);
   outline-offset: var(--outline-offset, var(--outline-size));
 }
 
-:is(button, li, summary):focus:not(:focus-visible) {
+:is(button, label, summary):focus:not(:focus-visible) {
   outline: none;
 }

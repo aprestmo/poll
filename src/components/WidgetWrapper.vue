@@ -13,7 +13,7 @@ withDefaults(
 )
 </script>
 
-<style scoped>
+<style>
 [data-widget-wrapper] {
   inline-size: min(100% - 3rem, 680px);
   margin-inline: auto;
