@@ -51,7 +51,7 @@ details {
   }
 
   p {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     font-size: var(--typography-editorial-infobox-body-min-font-size);
     line-height: var(--typography-editorial-infobox-body-min-line-height);
   }
