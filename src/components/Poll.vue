@@ -111,7 +111,10 @@ legend {
 footer {
   align-items: center;
   color: var(--color-typography-secondary);
+  display: flex;
+  flex-wrap: wrap;
   padding-inline: 0.125rem;
+  row-gap: 1rem;
 
   button {
     background-color: var(--color-button-secondary-default-bg);
@@ -120,13 +123,10 @@ footer {
     cursor: pointer;
     display: inline;
     font: inherit;
-    padding: 0;
+    margin-inline-start: 1rem;
     text-decoration: underline;
     text-underline-offset: 0.125rem;
     text-transform: uppercase;
-  }
-
-  span {
   }
 
   > *:not(details) {

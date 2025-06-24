@@ -35,7 +35,12 @@ import InfoIcon from '../assets/info.svg'
 }
 
 details {
+  display: contents;
+
   summary {
+    display: inline-flex;
+    margin-inline-start: auto;
+
     &::marker {
       content: '';
     }
@@ -46,6 +51,7 @@ details {
   }
 
   p {
+    flex: 0 0 auto;
     font-size: var(--typography-editorial-infobox-body-min-font-size);
     line-height: var(--typography-editorial-infobox-body-min-line-height);
   }
