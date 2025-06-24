@@ -18,7 +18,8 @@
       >
         <span>{{ question }}</span>
         <template v-if="selectedOption === null && !isAuthenticated">
-          <LockIcon />
+          <!-- DnIcon: Tror ikke dette finnes i pakken i dag -->
+          <LockIcon width="16" height="16" aria-hidden="true" focusable="false" />
         </template>
         <output v-else :for="getInputId(index)">{{ getAnimatedPercentage(index) }}%</output>
         <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
@@ -213,7 +214,7 @@ meter {
 /* Not logged in state */
 [data-user='not-logged-in'] legend + div {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 70%;
   pointer-events: none;
 }
 

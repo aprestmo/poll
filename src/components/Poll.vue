@@ -1,9 +1,11 @@
 <template>
+  <!-- Autentisering må gjøres mot DnID og hvorvidt man har svart påvirker noe styling -->
   <form
     :data-user="isAuthenticated ? 'logged-in' : 'not-logged-in'"
     :data-state="isAnswered ? 'answered' : 'unanswered'"
   >
     <fieldset>
+      <!-- Trenger et felt for dette fra backend: Adrian -->
       <legend>{{ title }}</legend>
       <QuestionOption
         :questions="[
@@ -17,12 +19,14 @@
         @poll-answered="handlePollAnswered"
       />
 
+      <!-- DnButton -->
       <FakeButton v-if="!isAuthenticated" @click="handleLogin" />
 
       <footer>
         <span v-if="!isAnswered">Svaret ditt er anonymt</span>
         <span v-else>{{ NumberFormat(randomVoteCount) }} stemmer</span>
-        <button v-if="isAnswered" @click="handleVoteAgain" type="reset">Stem på nytt</button>
+        <!-- DnButton -->
+        <!-- <button v-if="isAnswered" @click="handleVoteAgain" type="reset">Stem på nytt</button> -->
         <Disclaimer />
       </footer>
     </fieldset>
@@ -34,6 +38,8 @@ import { ref } from 'vue'
 import QuestionOption from './QuestionOption.vue'
 import FakeButton from './FakeButton.vue'
 import Disclaimer from './Disclaimer.vue'
+
+// Skal sjekke opp om dette er det rette formatet de liker i avisen :)
 import { NumberFormat } from '../utils/utils'
 
 interface Props {
@@ -47,23 +53,25 @@ const isAnswered = ref(false)
 const randomVoteCount = ref(0)
 const pollResetKey = ref(0)
 
+// DnID
 const handleLogin = (event: Event) => {
   event.preventDefault()
   isAuthenticated.value = true
 }
 
+// Byttes med reelle data fra backend
 const handlePollAnswered = () => {
   isAnswered.value = true
   // Generate a random number between 1000 and 50000
   randomVoteCount.value = Math.floor(Math.random() * 49000) + 1000
 }
 
-const handleVoteAgain = () => {
-  isAnswered.value = false
-  randomVoteCount.value = 0
-  // Reset the poll state by triggering a reset event
-  pollResetKey.value++
-}
+// const handleVoteAgain = () => {
+//   isAnswered.value = false
+//   randomVoteCount.value = 0
+//   // Reset the poll state by triggering a reset event
+//   pollResetKey.value++
+// }
 </script>
 
 <style>
@@ -75,7 +83,7 @@ form {
   padding-block-start: 1rem;
   padding-inline: 1rem;
 
-  &[data-state='not-logged in'] div[data-state] {
+  &[data-state='not-logged-in'] {
     opacity: 0.5;
     pointer-events: none;
   }
@@ -100,14 +108,6 @@ legend {
   font-size: 1rem;
   padding-inline: 0;
 }
-
-/* @supports (text-box: trim-both cap alphabetic) {
-  legend,
-  label,
-  span {
-    text-box: trim-both cap alphabetic;
-  }
-} */
 
 footer {
   align-items: center;
@@ -139,6 +139,7 @@ footer {
   }
 }
 
+/* Typisk utilityklasse. Usikker på om vi har den i biblioteket på en annen måte i dag */
 .visually-hidden {
   clip-path: inset(50%);
   height: 1px;
@@ -147,4 +148,12 @@ footer {
   white-space: nowrap;
   width: 1px;
 }
+
+/* @supports (text-box: trim-both cap alphabetic) {
+  legend,
+  label,
+  span {
+    text-box: trim-both cap alphabetic;
+  }
+} */
 </style>

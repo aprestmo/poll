@@ -2,7 +2,7 @@
   <details>
     <summary>
       <span class="visually-hidden">Informasjon om resultatene</span>
-      <InfoIcon width="16" height="16" />
+      <InfoIcon width="16" height="16" aria-hidden="true" focusable="false" />
     </summary>
     <p>
       Resultatene viser hva DNs lesere har svart, og er ikke nødvendigvis representative for
