@@ -11,7 +11,7 @@
   </details>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import InfoIcon from '../assets/info.svg'
 </script>
 
