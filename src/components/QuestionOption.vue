@@ -12,13 +12,8 @@
         :style="{
           '--percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
         }"
-        :class="{
-          animate: selectedOption !== null || isAuthenticated,
-          disabled: !isAuthenticated,
-        }"
         :data-question="selectedOption === index ? 'selected' : undefined"
         @click="handleLabelClick(index)"
-        role="button"
         :aria-pressed="selectedOption === index"
       >
         <span>{{ question }}</span>
