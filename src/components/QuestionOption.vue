@@ -244,14 +244,12 @@ meter {
 }
 
 /* Answered state */
-[data-state='answered'] {
-  [data-question='selected']::before {
-    background-color: var(--color-utility-success-light);
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNS44NjA0IDQuMDIwN0w2LjQ3OTk3IDEzLjA0MDRMMC45Mzk1MTQgNy43MTMwMUwxLjk3OTE4IDYuNjMxNzZMNi40Nzk5NyAxMC45NTk0TDE0LjgyMDggMi45Mzk0NUwxNS44NjA0IDQuMDIwN1oiIGZpbGw9IiMxMzI2NEEiLz4KPC9zdmc+Cg==');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 16px;
-    content: '';
-  }
+[aria-pressed='true']::before {
+  background-color: var(--color-utility-success-light);
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNS44NjA0IDQuMDIwN0w2LjQ3OTk3IDEzLjA0MDRMMC45Mzk1MTQgNy43MTMwMUwxLjk3OTE4IDYuNjMxNzZMNi40Nzk5NyAxMC45NTk0TDE0LjgyMDggMi45Mzk0NUwxNS44NjA0IDQuMDIwN1oiIGZpbGw9IiMxMzI2NEEiLz4KPC9zdmc+Cg==');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  content: '';
 }
 </style>
