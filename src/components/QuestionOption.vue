@@ -21,7 +21,7 @@
           <!-- DnIcon: Tror ikke dette finnes i pakken i dag -->
           <LockIcon width="16" height="16" aria-hidden="true" focusable="false" />
         </template>
-        <output v-else :id="getInputId(index)" :for="getInputId(index)"
+        <output v-else name="result" :for="getInputId(index)"
           >{{ getAnimatedPercentage(index) }}%</output
         >
       </label>
