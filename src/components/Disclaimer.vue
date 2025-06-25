@@ -54,6 +54,7 @@ details {
     flex: 0 1 auto;
     font-size: var(--typography-editorial-infobox-body-min-font-size);
     line-height: var(--typography-editorial-infobox-body-min-line-height);
+    margin-block-start: 1rem;
   }
 }
 </style>

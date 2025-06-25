@@ -53,23 +53,23 @@
 }
 
 /* Focus styles */
-:is(button, label, summary) {
+:is(button, li, summary) {
   --outline-size: max(2px, 0.08em);
   --outline-style: dashed;
   --outline-color: var(--color-brand-utility-200);
   --outline-offset: 0.5em;
 }
 
-:is(button, label, summary):focus {
+:is(button, li, summary):focus {
   outline: var(--outline-size) var(--outline-style) var(--outline-color);
   outline-offset: var(--outline-offset, var(--outline-size));
 }
 
-:is(button, label, summary):focus-visible {
+:is(button, li, summary):focus-visible {
   outline: var(--outline-size) var(--outline-style) var(--outline-color);
   outline-offset: var(--outline-offset, var(--outline-size));
 }
 
-:is(button, label, summary):focus:not(:focus-visible) {
+:is(button, li, summary):focus:not(:focus-visible) {
   outline: none;
 }

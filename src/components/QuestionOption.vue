@@ -1,8 +1,13 @@
 <template>
-  <div>
-    <template v-for="(question, index) in questions" :key="index">
+  <ol>
+    <li
+      v-for="(question, index) in questions"
+      :key="index"
+      :tabindex="isAuthenticated ? 0 : -1"
+      @keydown.enter="handleLabelClick(index)"
+      @keydown.space="handleLabelClick(index)"
+    >
       <label
-        :tabindex="isAuthenticated ? 0 : -1"
         :for="getInputId(index)"
         :style="{
           '--percentage': selectedOption !== null ? `${percentages[index]}%` : '0%',
@@ -13,30 +18,32 @@
         }"
         :data-question="selectedOption === index ? 'selected' : undefined"
         @click="handleLabelClick(index)"
-        @keydown.enter="handleLabelClick(index)"
-        @keydown.space="handleLabelClick(index)"
+        role="button"
+        :aria-pressed="selectedOption === index"
       >
         <span>{{ question }}</span>
         <template v-if="selectedOption === null && !isAuthenticated">
           <!-- DnIcon: Tror ikke dette finnes i pakken i dag -->
           <LockIcon width="16" height="16" aria-hidden="true" focusable="false" />
         </template>
-        <output v-else :for="getInputId(index)">{{ getAnimatedPercentage(index) }}%</output>
-        <meter :id="getInputId(index)" :value="getAnimatedPercentage(index)" :max="100"></meter>
-        <input
-          class="visually-hidden"
-          type="radio"
-          :id="getInputId(index)"
-          :name="name"
-          :value="getOptionLabel(index).toLowerCase()"
-          :disabled="selectedOption !== null"
-          :data-question="selectedOption === index ? 'selected' : undefined"
-          @change="handleSelection(index)"
-          tabindex="-1"
-        />
+        <output v-else :id="getInputId(index)" :for="getInputId(index)"
+          >{{ getAnimatedPercentage(index) }}%</output
+        >
       </label>
-    </template>
-  </div>
+      <meter :value="getAnimatedPercentage(index)" :max="100"></meter>
+      <input
+        class="visually-hidden"
+        type="radio"
+        :id="getInputId(index)"
+        :name="name"
+        :value="getOptionLabel(index).toLowerCase()"
+        :disabled="selectedOption !== null"
+        :data-question="selectedOption === index ? 'selected' : undefined"
+        @change="handleSelection(index)"
+        tabindex="-1"
+      />
+    </li>
+  </ol>
 </template>
 
 <script setup lang="ts">
@@ -120,7 +127,7 @@ const handleLabelClick = (index: number) => {
 </script>
 
 <style>
-fieldset div {
+ol {
   align-items: center;
   display: grid;
   grid-template-columns: 2rem 1fr 7ch;
@@ -128,16 +135,17 @@ fieldset div {
   list-style-position: inside;
   padding-inline-start: 0;
   row-gap: 1rem;
-
-  > * + * {
-    /* margin-block-start: 1rem; */
-  }
 }
 
-label {
+li {
   border-radius: var(--border-radius-default-min) var(--border-radius-default-min)
     calc(var(--border-radius-default-max) * 2) calc(var(--border-radius-default-max) * 2);
   counter-increment: item;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  grid-template-rows: auto 4px;
+  outline: none;
   overflow: clip;
 }
 
@@ -149,6 +157,16 @@ label {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
   min-block-size: 2.5rem;
+  outline: none;
+
+  &:has(~ input:disabled) {
+    pointer-events: none;
+  }
+
+  > * {
+    padding-block: 0.75rem;
+    padding-inline: 0.5rem;
+  }
 
   &::before {
     align-content: center;
@@ -160,11 +178,6 @@ label {
 
   span {
     border-inline-start: 1px solid var(--color-ui-generic-bg);
-  }
-
-  > *:not(meter) {
-    padding-block: 0.75rem;
-    padding-inline: 0.5rem;
   }
 
   svg {
@@ -183,6 +196,7 @@ meter {
   background: var(--color-brand-utility-200);
   block-size: 4px;
   grid-column: 1 / -1;
+  grid-row: 2;
   inline-size: 100%;
 
   &::-webkit-meter-bar {
@@ -212,20 +226,18 @@ meter {
  */
 
 /* Not logged in state */
-[data-user='not-logged-in'] legend + div {
-  cursor: not-allowed;
-  opacity: 70%;
+[data-user='not-logged-in'] ol {
   pointer-events: none;
 }
 
 /* Logged in state */
-[data-user='logged-in'][data-state='unanswered'] div {
+[data-user='logged-in'][data-state='unanswered'] ol {
   @media (hover) and (prefers-reduced-motion: no-preference) {
-    label {
+    li {
       transition: opacity 360ms ease-out;
     }
 
-    &:hover > label:not(:hover) {
+    &:hover > li:not(:hover) {
       opacity: 50%;
     }
   }

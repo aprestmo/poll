@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import QuestionOption from './QuestionOption.vue'
 import FakeButton from './FakeButton.vue'
 import Disclaimer from './Disclaimer.vue'
@@ -57,6 +57,14 @@ const pollResetKey = ref(0)
 const handleLogin = (event: Event) => {
   event.preventDefault()
   isAuthenticated.value = true
+
+  // Move focus to the first poll option after login
+  nextTick(() => {
+    const firstLi = document.querySelector('li[tabindex="0"]') as HTMLElement
+    if (firstLi) {
+      firstLi.focus()
+    }
+  })
 }
 
 // Byttes med reelle data fra backend
@@ -115,7 +123,6 @@ footer {
   display: flex;
   flex-wrap: wrap;
   padding-inline: 0.125rem;
-  row-gap: 1rem;
 
   button {
     background-color: var(--color-button-secondary-default-bg);
